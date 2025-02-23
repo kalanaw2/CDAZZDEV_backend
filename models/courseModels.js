@@ -93,6 +93,115 @@ class Course {
         })
     }
 
+    static updateStudentCourse(id, name, description, instructor, duration, start_date, end_date, price, status, video) {
+        return new Promise((resolve, reject) => {
+          const query = `
+            UPDATE courses 
+            SET 
+              name = ?, 
+              description = ?, 
+              instructor = ?, 
+              duration = ?, 
+              start_date = ?, 
+              end_date = ?, 
+              price = ?, 
+              status = ?, 
+              video =?
+            WHERE id = ?
+          `;
+      
+          db.query(
+            query, 
+            [name, description, instructor, duration, start_date, end_date, price, status, video, id], 
+            (err, result) => {
+              if (err) {
+                return reject(err);
+              }
+              resolve(result);
+            }
+          );
+        });
+      }
+
+      static updateVideos(id, videos) {
+        return new Promise((resolve, reject) => {
+          const query = `
+            UPDATE courses 
+            SET 
+              video_urls =?
+            WHERE id = ?
+          `;
+      
+          db.query(
+            query, 
+            [videos, id], 
+            (err, result) => {
+              if (err) {
+                return reject(err);
+              }
+              resolve(result);
+            }
+          );
+        });
+      }
+
+      static addCourse(courseDetails) {
+        return new Promise((resolve, reject) => {
+          const { name, description, instructor, duration, start_date, end_date, price, video, video_urls } = courseDetails;
+      
+          const query = `
+            INSERT INTO courses (name, description, instructor, duration, start_date, end_date, price, video, video_urls)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `;
+      
+          db.query(query, [name, description, instructor, duration, start_date, end_date, price, video, JSON.stringify(video_urls)], (err, result) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve(result);
+          });
+        });
+      }
+      
+      static AllEnrollment() {
+        return new Promise((resolve, reject) => {
+          const query = "SELECT * FROM course_enrollments";
+    
+          db.query(query, (err, result) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve(result);
+          });
+        });
+      } 
+
+      static updateEnrollment(id, course_id, student_id, status) {
+        return new Promise((resolve, reject) => {
+          const query = "UPDATE course_enrollments SET course_id = ?, student_id = ?, status = ? WHERE id = ?";
+    
+          db.query(query, [course_id, student_id, status, id], (err, result) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve(result);
+          });
+        });
+      }
+
+      static addEnrolment(student, course) {
+        return new Promise((resolve, reject) => {
+            const query = `INSERT INTO course_enrollments (course_id, student_id) VALUES (?, ?)`
+
+            db.query(query, [course, student],  (err, result) => {
+                if (err) {
+                    return reject(err)
+                }
+                resolve(result)
+            })
+        })
+    }
+
 }
 
 module.exports = Course
